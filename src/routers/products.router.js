@@ -29,7 +29,7 @@ productRouter.post("/", async (req, res) => {
 });
 
 productRouter.put("/:id", async (req, res) => {
-  const old = Product.findById(req.params.id);
+  const old = await Product.findById(req.params.id);
   const updated = await Product.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
@@ -45,7 +45,7 @@ productRouter.put("/:id", async (req, res) => {
 });
 
 productRouter.delete("/:id", async (req, res) => {
-  const deleted = Product.findByIdAndDelete(req.params.id);
+  const deleted = await Product.findByIdAndDelete(req.params.id);
   if (!deleted) {
     return res.json({ message: "product not found..." });
   }
