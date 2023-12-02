@@ -6,7 +6,7 @@ const cartSchema = new Schema(
     _id: { type: String, default: randomUUID, require: true },
     products: [
       {
-        _id: { type: String},
+        _id: { type: String, ref: "products"},
         quantity: { type: Number, default: 0},
       },
     ],
@@ -18,3 +18,4 @@ const cartSchema = new Schema(
 );
 
 export const Cart = model("carts", cartSchema);
+
