@@ -27,25 +27,37 @@ cartRouter.post("/:cid/product/:pid", async (req, res) => {
   try {
     const cartId = req.params.cid;
     const productId = req.params.pid;
-    const buscado = await Product.findById(productId)
+    const prodBuscado = await Product.findById(productId);
     const cart = await Cart.findById(cartId);
     if (!cart) {
       return res.status(404).json({ error: "cart not found..." });
     }
-
-    const product = cart.products.find((p) => p._id === buscado._id);
-    if(!product){
-      cart.products.push({_id: buscado._id, quantity: 1})
-      res.status(201).json({product, message: "Producto agregado existosamente"})
-    } else {
-      const indexProduct = cart.products.findIndex((p) => p._id === buscado._id)
-      cart.products[indexProduct].quantity++
-      res.json({mensaje: "El producto se incremento en el carrito" })
+    if (!prodBuscado) {
+      return res.status(404).json({ error: "product not found..." });
     }
 
-    await cart.save()
+    const existsInCart = cart.products.find((p) => p._id === prodBuscado._id);
 
-    
+    if (!existsInCart) {
+      await Cart.findByIdAndUpdate(
+        cartId,
+        {
+          $push: { products: { _id: productId, quantity: 1 } },
+        },
+        { new: true }
+      );
+      return res
+        .status(201)
+        .json({ message: "Producto agregado existosamente al carrito..." });
+    }
+
+    const updatedCart = await Cart.findOneAndUpdate(
+      { _id: cartId, "products._id": productId },
+      { $inc: { "products.$.quantity": 1 } },
+      { new: true }
+    );
+
+    res.status(201).json({ message: "Producto incrementado en carrito..." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
