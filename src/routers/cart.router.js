@@ -23,7 +23,7 @@ cartRouter.get("/:id", async (req, res) => {
   res.json(cart.products);
 });
 
-cartRouter.post("/:cid/product/:pid", async (req, res) => {
+cartRouter.post("/:cid/products/:pid", async (req, res) => {
   try {
     const cartId = req.params.cid;
     const productId = req.params.pid;
@@ -81,6 +81,18 @@ cartRouter.delete("/:cid/products/:pid", async (req, res) => {
     );
 
     res.json({ message: "Product deleted..." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+cartRouter.delete("/:cid", async (req, res) => {
+  try {
+    const cartId = req.params.cid;
+
+    const cart = await Cart.findByIdAndUpdate(cartId, { products: [] }, { new: true });
+
+    res.json({ message: "All products are deleted..." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
