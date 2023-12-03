@@ -5,19 +5,26 @@ import util from "node:util";
 export const productRouter = Router();
 
 productRouter.get("/", async (req, res) => {
-  const { limit = 10, page = 1, query = "" } = req.query;
-
+  const { limit = 10, page = 1, query = "{}" } = req.query;
   const parsedLimit = parseInt(limit);
-  const parsedPage = parseInt(page);
-  const paginationOptions = { limit: parsedLimit, page: parsedPage };
-  const criterioBusqueda = query;
+  const parsedPage = parseInt(page);  
+  const paginationOptions = { limit: parsedLimit, page: parsedPage }; 
+  let parsedQuery;
+
+  try{
+    parsedQuery = JSON.parse(query)
+  }catch(error){
+    return res.status(400).json({error: error.message})
+  }
+   
+  const criterioBusqueda = parsedQuery;
   const products = await Product.paginate(criterioBusqueda, paginationOptions);
 
   if (products.docs.length === 0) {
-    return res.json({ message: "products collection are empty..." });
-  }
+    return res.json({ message: "products collection are empty..." });  }
 
-  res.json(products);
+  res.json(products); 
+
 });
 
 productRouter.get("/:id", async (req, res) => {
