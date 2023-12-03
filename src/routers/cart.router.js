@@ -48,7 +48,7 @@ cartRouter.post("/:cid/product/:pid", async (req, res) => {
       );
       return res
         .status(201)
-        .json({ message: "Producto agregado existosamente al carrito..." });
+        .json({ message: "Product added succesfully..." });
     }
 
     const updatedCart = await Cart.findOneAndUpdate(
@@ -57,7 +57,30 @@ cartRouter.post("/:cid/product/:pid", async (req, res) => {
       { new: true }
     );
 
-    res.status(201).json({ message: "Producto incrementado en carrito..." });
+    res.status(201).json({ message: "Product increased in cart..." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+cartRouter.delete("/:cid/products/:pid", async (req, res) => {
+  try {
+    const cartId = req.params.cid;
+    const productId = req.params.pid;
+
+    const cart = await Cart.findById(cartId);
+
+    if (!cart) {
+      return res.status(404).json({ error: "cart not found..." });
+    }
+
+    const updatedCart = await Cart.findByIdAndUpdate(
+      cartId,
+      { $pull: { products: { _id: productId } } },
+      { new: true }
+    );
+
+    res.json({ message: "Product deleted..." });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
