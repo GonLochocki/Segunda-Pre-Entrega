@@ -1,30 +1,47 @@
-import { Router } from "express";
+import { Router, urlencoded } from "express";
 import { Product } from "../models/Products.mongoose.js";
 import util from "node:util";
 
 export const productRouter = Router();
 
 productRouter.get("/", async (req, res) => {
-  const { limit = 10, page = 1, query = "{}" } = req.query;
+  const { limit = 10, page = 1, query = "{}", sort = "{}" } = req.query;
   const parsedLimit = parseInt(limit);
-  const parsedPage = parseInt(page);  
-  const paginationOptions = { limit: parsedLimit, page: parsedPage }; 
+  const parsedPage = parseInt(page);
+  const paginationOptions = { limit: parsedLimit, page: parsedPage };
   let parsedQuery;
+  let parsedSort;
 
-  try{
-    parsedQuery = JSON.parse(query)
-  }catch(error){
-    return res.status(400).json({error: error.message})
+  try {
+    parsedQuery = JSON.parse(query);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
-   
-  const criterioBusqueda = parsedQuery;
-  const products = await Product.paginate(criterioBusqueda, paginationOptions);
+
+  try {
+    parsedSort = JSON.parse(sort);
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+
+  if (req.query.sort) {
+    try {
+      const aggregation = [{ $match: parsedQuery }, { $sort: parsedSort }];
+      const orderProducts = await Product.aggregate(aggregation);
+      return res.status(200).json(orderProducts);
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+  }
+
+  const searchParam = parsedQuery;
+  const products = await Product.paginate(searchParam, paginationOptions);
 
   if (products.docs.length === 0) {
-    return res.json({ message: "products collection are empty..." });  }
+    return res.json({ message: "products collection are empty..." });
+  }
 
-  res.json(products); 
-
+  res.json(products);
 });
 
 productRouter.get("/:id", async (req, res) => {
