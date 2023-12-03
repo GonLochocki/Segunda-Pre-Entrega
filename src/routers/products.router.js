@@ -1,6 +1,5 @@
 import { Router, urlencoded } from "express";
 import { Product } from "../models/Products.mongoose.js";
-import util from "node:util";
 
 export const productRouter = Router();
 
@@ -41,7 +40,16 @@ productRouter.get("/", async (req, res) => {
     return res.json({ message: "products collection are empty..." });
   }
 
-  res.json(products);
+  const context = {
+    pageTitle: "Listado de Productos",
+    hayDocs: products.docs.length > 0,
+    docs: products.docs,
+    limit: products.limit,
+    page: products.page,   
+  };
+
+  
+  res.render("products", context)
 });
 
 productRouter.get("/:id", async (req, res) => {

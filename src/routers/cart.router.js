@@ -20,7 +20,16 @@ cartRouter.get("/:id", async (req, res) => {
   if (!cart) {
     return res.json({ message: "cart not found..." });
   }
-  res.json(cart.products);
+
+  const context = {
+    pagetitle: "Carrito",
+    idCarrito: cart._id,
+    products: cart.products,
+    hayProductos: cart.products.length > 0
+    
+  }
+
+  res.render("carts", context);
 });
 
 cartRouter.post("/:cid/products/:pid", async (req, res) => {

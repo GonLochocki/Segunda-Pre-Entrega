@@ -1,0 +1,16 @@
+<h1>Cart</h1>
+
+<h2>Carrito {{idCarrito}}</h2>
+<br>
+
+{{#if hayProductos}}
+<ul>
+  {{#each products}}
+  <li>Producto: {{this._id}}</li>
+   
+  <br>
+  {{/each}}
+</ul>
+{{else}}
+nada para mostrar...<br>
+{{/if}}
