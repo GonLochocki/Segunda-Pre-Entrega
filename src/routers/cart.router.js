@@ -97,3 +97,21 @@ cartRouter.delete("/:cid", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+cartRouter.put("/:cid/products/:pid", async (req, res) => {
+  try {
+    const cartId = req.params.cid;
+    const productId = req.params.pid;
+    const newQuantity = req.body.quantity;
+
+    const cart = await Cart.findOneAndUpdate(
+      { _id: cartId, "products._id": productId },
+      { $set: { "products.$.quantity": newQuantity } },
+      { new: true }
+    );
+
+    res.json({ message: "Product quantity updated..." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
