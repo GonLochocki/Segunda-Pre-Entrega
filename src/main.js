@@ -3,8 +3,6 @@ import { MONGODB_CNX_STR, PORT } from "./config.js";
 import {connect} from "mongoose";
 import { apiRouter } from "./routers/api.router.js";
 
-
-
 await connect(MONGODB_CNX_STR)
 console.log("Base de datos conectada");
 
@@ -16,4 +14,5 @@ app.listen(PORT, () => {
 app.use("/static", express.static("./static"))
 
 app.use("/api", apiRouter);
+
 

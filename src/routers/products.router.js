@@ -1,13 +1,22 @@
 import { Router } from "express";
 import { Product } from "../models/Products.mongoose.js";
+import util from "node:util";
 
 export const productRouter = Router();
 
 productRouter.get("/", async (req, res) => {
-  const products = await Product.find();
-  if (products.length === 0) {
+  const { limit = 10, page = 1, query = "" } = req.query;
+
+  const parsedLimit = parseInt(limit);
+  const parsedPage = parseInt(page);
+  const paginationOptions = { limit: parsedLimit, page: parsedPage };
+  const criterioBusqueda = query;
+  const products = await Product.paginate(criterioBusqueda, paginationOptions);
+
+  if (products.docs.length === 0) {
     return res.json({ message: "products collection are empty..." });
   }
+
   res.json(products);
 });
 

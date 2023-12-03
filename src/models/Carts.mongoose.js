@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { randomUUID } from "crypto";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const cartSchema = new Schema(
   {
@@ -16,6 +17,8 @@ const cartSchema = new Schema(
     strict: "throw",
   }
 );
+
+cartSchema.plugin(mongoosePaginate);
 
 export const Cart = model("carts", cartSchema);
 
